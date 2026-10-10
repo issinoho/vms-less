@@ -28,7 +28,8 @@ describes the workflow and design. This file covers the rules and the pitfalls.
 ```sh
 tools/prepare.sh                        # always first after changing patches/overlay
 tools/build.sh <ia64|x86> [ALL|CLEAN] [KEEP_GOING]
-tools/test.sh <node>                    # smoke test
+tools/test.sh <node>                    # smoke test (non-interactive)
+tools/ttytest.sh <node>                 # interactive test over an ssh pty (needs pexpect, pyte)
 tools/vms.sh <node> dcl '<cmd>' ...     # run DCL; also run/batch/put/get
 tools/kit.sh <node>                     # PCSI kit -> out/kits/ (producer ISSINOHO)
 tools/installcheck.sh <node>            # install kit, verify, smoke-test, remove (changes system; ask first)
@@ -75,6 +76,9 @@ MMS does not track compiler flags: after changing `ccflags.txt` or `CFLAGS` in
 - **Known porting work:** reading keys from `/dev/tty` (VMS: `TT:`), raw mode through
   termios, output to a record-oriented terminal, `!command`, `v` (editor) and LESSOPEN
   through `system()`/`popen()`, and the exit status under DCL (`vms/vms_exit.c`).
+- **A runaway less starves the IA64 node** (one CPU): ssh stops answering. Find it with
+  `SHOW SYSTEM/PROCESS=FTA*` (state COM), check `F$GETJPI(pid,"IMAGNAME")` is LESS.EXE,
+  and `STOP/ID=` it. Run new interactive or record-file cases with a timeout first.
 - `>` on the command line is not redirected; use `PIPE`.
 
 ## Commits

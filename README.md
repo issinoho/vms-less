@@ -14,9 +14,10 @@ Work in progress.
 
 | Step | IA64 (V8.4-2L3) | x86-64 (E9.2-4) |
 |------|-----------------|-----------------|
-| Configure with VSI C (`tools/vms_configure.sh`) | running | running |
-| Build (`tools/build.sh`) | - | - |
-| DCL smoke test (`tools/test.sh`) | - | - |
+| Configure with VSI C (`tools/vms_configure.sh`) | done | done (same answers) |
+| Build (`tools/build.sh`) | clean | clean |
+| DCL smoke test, 8 checks (`tools/test.sh`) | 8/8 | 8/8 |
+| Interactive test, 14 checks (`tools/ttytest.sh`) | 14/14 | 14/14 |
 | PCSI kit `ISSINOHO <base> LESS V710.0-0E1` (`tools/kit.sh`) | - | - |
 | Install check (`tools/installcheck.sh`) | - | - |
 
@@ -27,7 +28,8 @@ cp tools/nodes.conf.example tools/nodes.conf   # then fill in the real nodes
 tools/prepare.sh                               # fetch, verify, patch, configure, stage
 tools/vms_configure.sh <node>                  # once per upstream release: configure with VSI C
 tools/build.sh <node>                          # push and build with MMS
-tools/test.sh <node>                           # smoke test
+tools/test.sh <node>                           # smoke test (non-interactive, on VMS)
+tools/ttytest.sh <node>                        # interactive test from the host (pexpect, pyte)
 tools/kit.sh <node>                            # PCSI kit
 tools/installcheck.sh <node>                   # install, verify, remove
 ```
