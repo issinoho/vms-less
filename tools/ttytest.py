@@ -139,6 +139,12 @@ def main():
     check('help', 'SUMMARY OF LESS COMMANDS' in '\n'.join(s.screen.display), s)
     s.send('q')
     check('help-quit', s.row(0) == 'line 151', s)
+    # v: the editor (EDIT, TPU/EVE), left with CTRL/Z.
+    s.send('v', 5)
+    check('edit', 'Buffer: TTYTEST.TXT' in '\n'.join(s.screen.display).upper()
+          or 'BUFFER: TTYTEST.TXT' in '\n'.join(s.screen.display).upper(), s)
+    s.send('\x1a', 4)
+    check('edit-return', s.row(0) == 'line 151', s)
     s.send('q')
     s.screen.reset()
     s.dcl('show symbol $status')

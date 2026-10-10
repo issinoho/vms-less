@@ -49,3 +49,11 @@ One entry per build or run problem, newest last. Triage codes:
 | Code | Problem | Root cause | Fix |
 |------|---------|------------|-----|
 | F | `less ref.txt` (a file made with CREATE) took the CPU until stopped; the node stopped answering ssh (one CPU) | A variable-length record file reads as lines, but the C RTL cannot lseek to the byte offsets less computes, so less read the same data again forever (as vms-tar's D1: record files' sizes and offsets are not byte counts) | Patch 0004: record files are not seekable; less keeps what it read, as for a pipe. Tested interactively on a 723-file DIRECTORY listing: G, g, search, b |
+
+## 2026-10-10: commands (IA64)
+
+| Code | Problem | Root cause | Fix |
+|------|---------|------------|-----|
+| S | `v` did nothing visible | The default LESSEDIT gave `EDIT +1 file`; DCL's EDIT takes no `+line` | Patch 0005: `%E %g` on VMS |
+| S | `v`: EDIT "Error parsing \[.dir\]x.c" | less quotes names for a Unix shell; DCL keeps the backslashes | Patch 0006: no shell quoting on VMS |
+| – | LESSOPEN | `popen()` of a DCL command works (`DEFINE LESSOPEN "|SEARCH %s define"`) | none |

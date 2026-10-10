@@ -1,0 +1,29 @@
+Subject: filename.c: on OpenVMS, no shell quoting
+
+less quotes file names and commands for a Unix shell (a backslash
+before [, ], spaces and the like) when it expands %g and friends for
+the "v" and "!" commands and LESSOPEN.  DCL has no such quoting, and a
+DCL verb keeps the backslashes or quotes as part of a file
+specification: "v" ran "EDIT \[.dir\]x.c", which EDIT could not parse.
+On VMS shell_quoten() returns the string as it is.
+
+--- a/filename.c	2026-09-09 02:42:36.000000000 +0100
++++ b/filename.c	2026-10-10 11:20:13.446414707 +0100
+@@ -151,6 +151,17 @@
+ 	constant char *p;
+ 	lbool use_quotes = FALSE;
+ 	constant char *es = s + slen;
++#ifdef __VMS
++	/*
++	 * DCL has no shell quoting: a backslash or quotes would become part
++	 * of a file specification ("EDIT \[.dir\]x.c" fails).  Pass the
++	 * name as it is.
++	 */
++	(void) p; (void) use_quotes; (void) es;
++	newstr = (char *) ecalloc(slen+1, sizeof(char));
++	memcpy(newstr, s, slen);
++	return (newstr);
++#endif
+ #if MSDOS_COMPILER
+ 	int cbs = 0; /* consecutive backslashes */
+ 

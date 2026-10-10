@@ -1,0 +1,24 @@
+Subject: main.c: on OpenVMS, the default edit command has no "+line"
+
+less's "v" command runs LESSEDIT, by default "%E ?lm+%lm. %g", which
+gives "EDIT +12 file".  DCL's EDIT (TPU/EVE, EDT) takes no "+line"
+argument, so the command failed and less redrew the screen over the
+message.  On VMS the default is "%E %g"; LESSEDIT can still give an
+editor's own way to start at a line.
+
+--- a/main.c	2026-09-09 02:42:35.000000000 +0100
++++ b/main.c	2026-10-10 11:18:48.571749358 +0100
+@@ -327,8 +327,13 @@
+ 	}
+ 	editproto = lgetenv("LESSEDIT");
+ 	if (isnullenv(editproto))
++#ifdef __VMS
++		/* DCL's EDIT (and EDT, EVE) take no "+line" argument. */
++		editproto = "%E %g";
++#else
+ 		editproto = "%E ?lm+%lm. %g";
+ #endif
++#endif
+ 
+ 	/*
+ 	 * Call get_ifile with all the command line filenames

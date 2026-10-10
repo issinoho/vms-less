@@ -33,3 +33,21 @@ Use
 ---
     $ less LOGIN.COM
     $ pipe directory/full | less
+    $ define less "-i -M"          ! options: a logical name, not a symbol
+
+less supports VT100, VT200-VT500 series and DECterm terminals, and xterm
+or other ANSI emulators over ssh (DEFINE TERM "xterm").  The screen size
+follows SET TERMINAL/WIDTH and /PAGE.  !command runs DCL, v runs EDIT
+(or EDITOR or VISUAL), and LESSOPEN can name a DCL command:
+
+    $ define lessopen "|search %s error"
+
+Known limits
+------------
+- Options and other variables are read from logical names, not DCL
+  symbols: the LESS symbol is the command itself.
+- v starts the editor at the top of the file; set LESSEDIT for an
+  editor's own way to start at a line.
+- A record file (VAR, VFC, FIX) is read like a pipe: less keeps what it
+  has read in memory.
+- > on the command line is not redirected; use PIPE.
