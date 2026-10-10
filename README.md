@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/banner.svg" alt="GNU less for OpenVMS: a DECterm window paging SYSTARTUP_VMS.COM with less, a search match and the -M prompt in reverse video, with the GNU head" width="100%">
+</p>
+
 # vms-less
 
 less 710, the pager, for OpenVMS (IA64 and x86-64), built natively with VSI C.
@@ -17,7 +21,7 @@ The repository stores only our changes over the signed upstream release:
 | DCL smoke test, 8 checks (`tools/test.sh`) | 8/8 | 8/8 |
 | Interactive test, 16 checks (`tools/ttytest.sh`) | 16/16 | 16/16 |
 | PCSI kit `ISSINOHO <base> LESS V7.10-0E1` (`tools/kit.sh`) | built | built |
-| Install check (`tools/installcheck.sh`) | - | - |
+| Install check (`tools/installcheck.sh`): install, smoke 8/8, clean removal | pass | pass |
 
 ## Workflow
 
@@ -78,3 +82,12 @@ $ define less "-i -M"          ! options: a logical name, not a symbol
 Every problem met and its fix is in [docs/PORTING_LOG.md](docs/PORTING_LOG.md); the design
 decisions are in [docs/DECISIONS.md](docs/DECISIONS.md), and the rules and pitfalls for working
 on the port in `CLAUDE.md`.
+
+## Artwork
+
+`docs/images/banner.svg` and `docs/images/icon.svg` were made for this project in the style of
+classic DECwindows and VT terminals, like those of its sibling ports. They incorporate the
+[GNU head](https://www.gnu.org/graphics/heckert_gnu.html) by Aurelio A. Heckert, © 2003 Free
+Software Foundation, Inc., used under the Creative Commons Attribution-ShareAlike 2.0 licence.
+The two images are therefore also licensed under
+[CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/).
