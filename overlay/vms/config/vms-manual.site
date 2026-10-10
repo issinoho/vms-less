@@ -1,0 +1,10 @@
+# Hand-settled configure answers for OpenVMS (VSI C, both IA64 and x86-64).
+#
+# Loaded after the VSI C configure answers, so values here win.  Use this for checks the
+# VSI C configure run cannot answer: run-time behaviour tests (AC_RUN_IFELSE),
+# compiler-feature tests, and anything it got wrong.  Give a reason
+# for every entry.
+
+# configure reads byte order out of an object file in cross mode, which
+# vmscc does not return.  IA64 (as used by VMS) and x86-64 are little-endian.
+ac_cv_c_bigendian=no

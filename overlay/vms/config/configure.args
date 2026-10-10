@@ -1,0 +1,9 @@
+# Options for configure (one per line); both the VSI C run (vms_configure.sh)
+# and the host run in prepare.sh use them.
+# No termcap or terminfo library on VMS: vms/vms_termcap.c supplies the
+# termcap functions (docs/DECISIONS.md D1).
+--without-termlib
+# The C RTL has no <regex.h>; less's own regexp.c (Henry Spencer's).
+--with-regex=regcomp-local
+# The VMS editor, as DCL's EDIT command (for less's "v" command).
+--with-editor=EDIT

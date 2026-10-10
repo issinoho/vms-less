@@ -1,0 +1,30 @@
+--
+-- PCSI product description for less on OpenVMS.
+-- Template: tools/prepare.sh substitutes @PRODUCER@, @BASE@ and @PCSIVERSION@.
+--
+product @PRODUCER@ @BASE@ LESS @PCSIVERSION@ full ;
+
+    information RELEASE_NOTES phase after ;
+
+    directory [LESS] ;
+    directory [LESS.BIN] ;
+    directory [LESS.DOC] ;
+
+    file [LESS.BIN]LESS.EXE ;
+    file [SYS$STARTUP]LESS$STARTUP.COM ;
+    file [LESS]LESS$SETUP.COM ;
+    file [LESS.DOC]README.VMS ;
+    file [LESS.DOC]COPYING. ;
+    file [LESS.DOC]NEWS. ;
+    file [LESS.DOC]LESS.TXT ;
+    file [LESS.DOC]LESS.1 ;
+
+    -- Define LESS$ROOT now and print the post-installation tasks (PCSI shows
+    -- only the title of an information message unless /HELP is given).
+    execute postinstall "@PCSI$DESTINATION:[SYS$STARTUP]LESS$STARTUP.COM INSTALL" interactive ;
+    -- On removal, deassign LESS$ROOT.
+    execute install "CONTINUE" remove "@PCSI$DESTINATION:[SYS$STARTUP]LESS$STARTUP.COM REMOVE" ;
+
+    information POST_INSTALL phase after ;
+
+end product ;

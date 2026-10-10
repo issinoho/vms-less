@@ -1,0 +1,35 @@
+less for OpenVMS
+================
+
+This is less @VERSION@, the pager, built natively for OpenVMS @ARCH@, from
+the unmodified release plus the patches in the vms-less project:
+
+    https://github.com/issinoho/vms-less
+
+Kit version: @KITVERSION@.  less is free software under the GNU General
+Public License, version 3 or later, or the Less License; see COPYING.  The
+manual is LESS.1, also as plain text in LESS.TXT.
+
+Files
+-----
+    LESS$ROOT:[BIN]LESS.EXE
+    LESS$ROOT:[DOC]                     this file, COPYING, NEWS, the manual
+    LESS$ROOT:[000000]LESS$SETUP.COM    defines the less command
+    SYS$STARTUP:LESS$STARTUP.COM        defines LESS$ROOT
+
+Setup
+-----
+The kit installs LESS$STARTUP.COM into SYS$STARTUP and runs it once.  To
+define LESS$ROOT at every boot, the system manager adds this line to
+SYS$MANAGER:SYSTARTUP_VMS.COM:
+
+    $ @SYS$STARTUP:LESS$STARTUP.COM
+
+Each user then defines the command (for example in LOGIN.COM):
+
+    $ @LESS$ROOT:[000000]LESS$SETUP.COM
+
+Use
+---
+    $ less LOGIN.COM
+    $ pipe directory/full | less
