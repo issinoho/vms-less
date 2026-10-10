@@ -41,6 +41,8 @@ def main():
     # TUKLIB_SYMBOL_PREFIX); descrip.mms then defines that macro.
     lib_cflags = os.environ.get('GEN_MMS_LIB_CFLAGS', 'CFLAGS')
     config_dir = os.environ.get('GEN_MMS_CONFIG_DIR', 'LIB')
+    # The configure header (less: defines.h).
+    config_h = os.environ.get('GEN_MMS_CONFIG_H', 'config.h')
     groups = [('LIB', lib_base, read_list(sys.argv[2])),
               ('SRC', src_base, read_list(sys.argv[3])),
               ('EXTRA', '', read_list(sys.argv[4]))]
@@ -63,10 +65,10 @@ def main():
             objs.append(obj)
             # "-": carry on past a warning status (less has benign
             # VSI C warnings); tools/build.sh fails the build on %CC-E/-F.
-            # Every object also depends on config.h: MMS here tracks no header
+            # Every object also depends on the configure header: MMS here tracks no header
             # dependencies, and a configuration change must rebuild everything.
             flags = lib_cflags if macro == 'LIB' else 'CFLAGS'
-            rules += ['%s : %s%s, %sconfig.h' % (obj, vms_dir(os.path.dirname(full)), os.path.basename(full), '[.%s]' % config_dir if config_dir else '[]'),
+            rules += ['%s : %s%s, %s%s' % (obj, vms_dir(os.path.dirname(full)), os.path.basename(full), '[.%s]' % config_dir if config_dir else '[]', config_h),
                       '\t- $(CC) $(%s) /OBJECT=$(MMS$TARGET) $(MMS$SOURCE)' % flags, '']
         out.append('%s_OBJS = %s' % (macro, ', -\n\t'.join(objs) if objs else ''))
         out.append('')

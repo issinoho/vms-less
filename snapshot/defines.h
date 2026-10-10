@@ -283,7 +283,7 @@
 #define HAVE_NANOSLEEP 1
 
 /* Define to 1 if you have the <ncursesw/termcap.h> header file. */
-#define HAVE_NCURSESW_TERMCAP_H 1
+/* #undef HAVE_NCURSESW_TERMCAP_H */
 
 /* Define to 1 if you have the <ncurses/termcap.h> header file. */
 /* #undef HAVE_NCURSES_TERMCAP_H */
@@ -346,7 +346,7 @@
 #define HAVE_STAT_INO 1
 
 /* Define to 1 if you have the <stdckdint.h> header file. */
-#define HAVE_STDCKDINT_H 1
+/* #undef HAVE_STDCKDINT_H */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -367,13 +367,13 @@
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the 'strsignal' function. */
-#define HAVE_STRSIGNAL 1
+/* #undef HAVE_STRSIGNAL */
 
 /* Define to 1 if you have the 'system' function. */
 #define HAVE_SYSTEM 1
 
 /* Define HAVE_SYS_ERRLIST if you have the sys_errlist[] variable. */
-#define HAVE_SYS_ERRLIST 1
+/* #undef HAVE_SYS_ERRLIST */
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #define HAVE_SYS_IOCTL_H 1
@@ -397,7 +397,7 @@
 /* #undef HAVE_TERMINFO */
 
 /* Define HAVE_TERMIOS_FUNCS if you have tcgetattr/tcsetattr. */
-#define HAVE_TERMIOS_FUNCS 1
+/* #undef HAVE_TERMIOS_FUNCS */
 
 /* Define to 1 if you have the <termios.h> header file. */
 #define HAVE_TERMIOS_H 1
@@ -439,13 +439,13 @@
 #define HAVE_V8_REGCOMP 1
 
 /* Define to 1 if you have the <values.h> header file. */
-#define HAVE_VALUES_H 1
+/* #undef HAVE_VALUES_H */
 
 /* Define HAVE_VOID if your compiler supports the "void" type. */
 #define HAVE_VOID 1
 
 /* Define to 1 if you have the '_setjmp' function. */
-#define HAVE__SETJMP 1
+/* #undef HAVE__SETJMP */
 
 /* Define MUST_DEFINE_ERRNO if you have errno but it is not defined in
    errno.h. */

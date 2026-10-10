@@ -36,6 +36,9 @@ rm -rf "$stage"
 mkdir -p "$top/staging"
 tar -xf "$tarball" -C "$top/staging"
 [ -d "$stage" ] || die "tarball did not unpack to $stage"
+# Some tarballs (less) unpack read-only; the copies pushed to VMS must be
+# writable, or the next push cannot replace them.
+chmod -R u+w "$stage"
 
 while read -r p; do
     case $p in ''|'#'*) continue ;; esac
@@ -96,7 +99,7 @@ mkdir -p "$stage/vms"
 : > "$hostcfg/lib-sources.txt"
 echo "$src_srcs" > "$hostcfg/src-sources.txt"
 cp "$top/overlay/vms/extra-sources.txt" "$hostcfg/extra-sources.txt"
-GEN_MMS_SRC_BASE= GEN_MMS_CONFIG_DIR= python3 "$top/tools/gen_mms.py" \
+GEN_MMS_SRC_BASE= GEN_MMS_CONFIG_DIR= GEN_MMS_CONFIG_H=defines.h python3 "$top/tools/gen_mms.py" \
     "$cfgdir/ccflags.txt" "$hostcfg/lib-sources.txt" "$hostcfg/src-sources.txt" "$hostcfg/extra-sources.txt" \
     > "$stage/vms/sources.mms"
 
