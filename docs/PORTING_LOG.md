@@ -41,3 +41,11 @@ One entry per build or run problem, newest last. Triage codes:
 | L | less quit at the end of every file | `getenv("LESS")` returned the DCL symbol `LESS :== $...LESS.EXE`, read as options (`E`) | D3: `vms_env.c`, patch 0002 |
 | S | `!show time`: output overwritten by "!done" | VMS writes the command's output as records (LF, text, CR) | Patch 0003 |
 | S | CTRL/C cancelled less | No CTRL/C AST, so the driver cancelled the image; then the read ended with SS$_CONTROLC, which `vms_tty_getc` took for an error (exit 1) | CTRL/C AST in `vms_tty.c`; SS$_CONTROLC is an interrupt |
+
+## 2026-10-10: smoke test (IA64)
+
+`[.VMS]TEST_SMOKE.COM` passes 8 of 8 on IA64.
+
+| Code | Problem | Root cause | Fix |
+|------|---------|------------|-----|
+| F | `less ref.txt` (a file made with CREATE) took the CPU until stopped; the node stopped answering ssh (one CPU) | A variable-length record file reads as lines, but the C RTL cannot lseek to the byte offsets less computes, so less read the same data again forever (as vms-tar's D1: record files' sizes and offsets are not byte counts) | Patch 0004: record files are not seekable; less keeps what it read, as for a pipe. Tested interactively on a 723-file DIRECTORY listing: G, g, search, b |

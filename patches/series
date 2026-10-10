@@ -2,3 +2,4 @@
 0001-vms-terminal-io.patch
 0002-vms-getenv-no-symbols.patch
 0003-vms-lsystem-records.patch
+0004-vms-record-files-not-seekable.patch

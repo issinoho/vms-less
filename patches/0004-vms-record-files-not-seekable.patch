@@ -1,0 +1,45 @@
+Subject: ch.c: on OpenVMS, a record file is not seekable
+
+Most VMS text files are record files (variable length, VFC, fixed).
+They read as lines, but the C RTL cannot lseek to the byte offsets less
+computes from what it read, so less read the same data again forever: a
+file made with CREATE took the CPU until it was stopped.  On VMS only
+stream files (Stream, Stream_LF, Stream_CR) and undefined-format files
+are seekable; less handles the others as it handles a pipe, keeping
+what it has read in memory.
+
+--- a/ch.c	2026-09-09 02:42:35.000000000 +0100
++++ b/ch.c	2026-10-10 10:56:42.392846963 +0100
+@@ -15,6 +15,10 @@
+  */
+ 
+ #include "less.h"
++#ifdef __VMS
++#include <fabdef.h>
++#include <sys/stat.h>
++#endif
+ #if MSDOS_COMPILER==WIN32C
+ #include <errno.h>
+ #include <windows.h>
+@@ -836,6 +840,21 @@
+  */
+ public lbool seekable(int f)
+ {
++#ifdef __VMS
++	/*
++	 * A record file (variable length, VFC, fixed: most VMS text files)
++	 * reads as lines, but the C RTL cannot lseek to the byte offsets
++	 * less computes from them, so less would read the same data again
++	 * forever.  Treat it as a pipe: less keeps what it has read.
++	 */
++	{
++		struct stat st;
++		if (fstat(f, &st) == 0 && S_ISREG(st.st_mode) &&
++		    st.st_fab_rfm != FAB$C_STM && st.st_fab_rfm != FAB$C_STMLF &&
++		    st.st_fab_rfm != FAB$C_STMCR && st.st_fab_rfm != FAB$C_UDF)
++			return (FALSE);
++	}
++#endif
+ #if MSDOS_COMPILER
+ 	extern int fd0;
+ 	if (f == fd0 && !isatty(fd0))
