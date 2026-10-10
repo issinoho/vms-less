@@ -1,1 +1,4 @@
 # Ordered list of patches applied to the upstream tree (one per line).
+0001-vms-terminal-io.patch
+0002-vms-getenv-no-symbols.patch
+0003-vms-lsystem-records.patch

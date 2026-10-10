@@ -2,3 +2,5 @@
 vms/vms_crtl_init.c
 vms/vms_exit.c
 vms/vms_termcap.c
+vms/vms_tty.c
+vms/vms_env.c

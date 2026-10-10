@@ -1,0 +1,34 @@
+Subject: OpenVMS: environment variables without DCL symbols
+
+The VSI C RTL's getenv() falls back to DCL symbols, and the command that
+runs less is the symbol LESS :== $...LESS.EXE: getenv("LESS") returned
+the image's file name, which less parsed as its options ("E" in "EXE"
+made it quit at the end of the file).  On VMS lgetenv() uses
+vms_getenv() (vms/vms_env.c): the C environment, then logical names,
+never symbols (docs/DECISIONS.md D3).
+
+--- a/decode.c	2026-09-09 02:42:36.000000000 +0100
++++ b/decode.c	2026-10-10 10:19:01.789521890 +0100
+@@ -30,6 +30,9 @@
+  */
+ 
+ #include "less.h"
++#ifdef __VMS
++#include "vms_env.h"
++#endif
+ #include "cmd.h"
+ #include "lesskey.h"
+ 
+@@ -1208,7 +1211,12 @@
+ 	if (!isnullenv(s))
+ 		return (s);
+ #endif
++#ifdef __VMS
++	/* Not DCL symbols: LESS is the command's own (vms/vms_env.c). */
++	s = vms_getenv(var);
++#else
+ 	s = getenv(var);
++#endif
+ 	if (!isnullenv(s))
+ 	{
+ #if !GETENV_NONVOLATILE

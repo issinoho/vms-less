@@ -18,8 +18,12 @@ BIN = [.BIN_$(ARCH)]
 .INCLUDE [.VMS]SOURCES.MMS
 
 CC = CC
+! SYSDIR: where less looks for the system-wide lesskey file (less's Makefile
+! passes it with -D): LESS$ROOT:[000000]sysless.  BINDIR and LIBEXECDIR are
+! optional and not used (lessecho is not built).  exit=vms_exit gives
+! failures error severity under DCL (vms/vms_exit.c).
 CFLAGS = $(CC_QUAL)/NOLIST/INCLUDE_DIRECTORY=("./","./vms")-
-	/DEFINE=($(CC_DEFS),HAVE_CONFIG_H)
+	/DEFINE=($(CC_DEFS),HAVE_CONFIG_H,"exit=vms_exit","SYSDIR=""/LESS$ROOT""")
 
 ALL : $(BIN)LESS.EXE
 	@ CONTINUE

@@ -4,10 +4,10 @@
    not defined the corresponding DECC$ logical name, so a site can still
    override any of them.
 
-   Part of the OpenVMS port of GNU findutils (from the GNU grep port); distributed under the GNU
+   Part of the OpenVMS port of less (from the GNU grep port); distributed under the GNU
    General Public License, version 3 or later.  */
 
-#include <config.h>
+#include "defines.h"
 
 #include <stdlib.h>
 /* gnulib renames getcwd and mkdir (lib/unistd.h, lib/sys/stat.h);

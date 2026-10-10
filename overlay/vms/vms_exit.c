@@ -1,21 +1,20 @@
-/* vms_exit.c - exit() for GNU findutils on OpenVMS.
+/* vms_exit.c - exit() for less on OpenVMS.
 
    With _POSIX_EXIT the VSI C RTL encodes exit(n) as %X35A000 + n*8 + 1,
    which has success severity, so to DCL a failed run looks successful.
-   lib/stdlib.h (patch) routes exit() here.  Under a Unix shell (GNV bash:
+   descrip.mms defines exit as vms_exit, so exit() comes here (less has no
+   gnulib <stdlib.h> to route it).  Under a Unix shell (GNV bash:
    SHELL is set and is not "DCL") keep the POSIX exit, which the shell
-   decodes as $?.  Under DCL, exit code 0 is success.  Every other code N
-   is an error: find's 1 (a file or directory could not be processed) and
-   xargs's 1 and 123-127 (a command failed, was killed, or could not be
-   run) all mean the job did not do everything it was asked.  N becomes an
-   error-severity status with the message suppressed (%X1035A002 + N*8), so
-   $SEVERITY is 2 and ON ERROR fires; N is (status & %X7F8) / 8.
+   decodes as $?.  Under DCL, exit code 0 is success; less's other codes (1
+   for an error, 2 for an interrupt in some versions) are errors: N becomes
+   an error-severity status with the message suppressed (%X1035A002 + N*8),
+   so $SEVERITY is 2 and ON ERROR fires; N is (status & %X7F8) / 8.
 
-   Part of the OpenVMS port of GNU findutils
-   (github.com/issinoho/vms-findutils), as in vms-gzip and vms-tar;
-   distributed under the GNU General Public License, version 3 or later.  */
+   Part of the OpenVMS port of less (github.com/issinoho/vms-less), as in
+   vms-gzip, vms-tar and vms-findutils; distributed under the GNU General
+   Public License, version 3 or later.  */
 
-#include <config.h>
+#include "defines.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -1,0 +1,164 @@
+Subject: OpenVMS: keyboard and screen through the terminal driver
+
+The VSI C RTL has no termios (its <termios.h> lists the functions as
+"NOT IMPLEMENTED"), no <termio.h> and no <sgtty.h>; its poll() does not
+work on a terminal; and write() to a terminal goes through the driver's
+formatting, which wraps lines where it believes the cursor is and counts
+escape sequences as printing characters.  On VMS (vms/vms_tty.c,
+docs/DECISIONS.md D2):
+
+- screen.c: no termios include; raw_mode() only sets DCL's editing
+  keys (DEL, ^U, ^W): each keyboard read is raw by itself;
+  set_termio_flags() is not built (VMS's <sys/ioctl.h> defines TCGETA,
+  but there is no struct termio);
+- ttyin.c: getchr() reads a byte with vms_tty_getc() (IO$_READVBLK,
+  no echo, no filtering, no terminators); open_tty() does not call
+  ttyname(), which the C RTL does not declare;
+- os.c: ttyin_ready() is the driver's type-ahead count, and poll() is
+  not used;
+- output.c: flush() writes to the terminal with vms_tty_write()
+  (IO$_WRITEVBLK, IO$M_NOFORMAT); to anything else with write().
+--- a/screen.c	2026-09-09 02:42:35.000000000 +0100
++++ b/screen.c	2026-10-10 10:10:21.095721083 +0100
+@@ -54,6 +54,9 @@
+ #include <sys/ioctl.h>
+ #endif
+ 
++#if defined __VMS
++/* No termios (the C RTL declares it "NOT IMPLEMENTED"): vms/vms_tty.c.  */
++#else
+ #if HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
+ #include <termios.h>
+ #else
+@@ -67,6 +70,7 @@
+ #endif
+ #endif
+ #endif
++#endif
+ 
+ #if HAVE_TERMINFO && !USE_TERMCAP
+ #define USE_TERMINFO 1
+@@ -331,7 +335,7 @@
+ extern int tty;
+ #endif
+ 
+-#if (HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS) || defined(TCGETA)
++#if !defined __VMS && ((HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS) || defined(TCGETA))
+ /*
+  * Set termio flags for use by less.
+  */
+@@ -423,7 +427,18 @@
+ 		werase_char = CONTROL('W');
+ 	} else
+ #endif /*LESSTEST*/
+-#if HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
++#if defined __VMS
++    {
++	/*
++	 * OpenVMS: the keyboard is read raw by vms_tty_getc (each read asks
++	 * for no echo and no filtering), so there is no mode to set.  The
++	 * editing keys are DCL's: DEL erases, ^U and ^W kill.
++	 */
++	erase_char = '\177';
++	kill_char = CONTROL('U');
++	werase_char = CONTROL('W');
++    }
++#elif HAVE_TERMIOS_H && HAVE_TERMIOS_FUNCS
+     {
+ 	struct termios s;
+ 	static struct termios save_term;
+--- a/ttyin.c	2026-09-09 02:42:38.000000000 +0100
++++ b/ttyin.c	2026-10-10 10:07:09.741916109 +0100
+@@ -13,6 +13,9 @@
+  */
+ 
+ #include "less.h"
++#ifdef __VMS
++#include "vms_tty.h"
++#endif
+ #if OS2
+ #include "cmd.h"
+ #include "pckeys.h"
+@@ -75,7 +78,7 @@
+ 			fd = 0; /* assume lesstest uses stdin */
+ 	}
+ #endif /*LESSTEST*/
+-#if HAVE_TTYNAME
++#if HAVE_TTYNAME && !defined __VMS
+ 	if (fd < 0)
+ 	{
+ 		constant char *dev = ttyname(2);
+@@ -211,7 +214,14 @@
+ #else /* LESS_IREAD_TTY */
+ 		{
+ 			unsigned char uc;
++#ifdef __VMS
++			/* Raw, unechoed, from the terminal channel (vms/vms_tty.c). */
++			result = vms_tty_getc(&uc);
++			if (result == -2)
++				result = READ_INTR;
++#else
+ 			result = iread(tty, &uc, sizeof(char));
++#endif
+ 			c = (char) uc;
+ 		}
+ 		if (result == READ_INTR)
+--- a/os.c	2026-09-09 02:42:37.000000000 +0100
++++ b/os.c	2026-10-10 10:07:09.742459066 +0100
+@@ -21,6 +21,9 @@
+  */
+ 
+ #include "less.h"
++#ifdef __VMS
++#include "vms_tty.h"
++#endif
+ #include <signal.h>
+ #include <setjmp.h>
+ #if MSDOS_COMPILER==WIN32C
+@@ -117,6 +120,10 @@
+ 	if (idelay > 0)
+ 		screenfill_ms = idelay;
+ #if USE_POLL
++#if defined __VMS
++	/* The C RTL's poll() does not work on a terminal; see ttyin_ready. */
++	use_poll = FALSE;
++#endif
+ #if defined(__APPLE__)
+ 	/* In old versions of MacOS, poll() does not work with /dev/tty. */
+ 	struct utsname uts;
+@@ -180,6 +187,10 @@
+  */
+ public lbool ttyin_ready(void)
+ {
++#if defined __VMS
++	/* The terminal driver's type-ahead count (vms/vms_tty.c). */
++	return vms_tty_ready() ? TRUE : FALSE;
++#endif
+ #if MSDOS_COMPILER==WIN32C
+ 	return win32_kbhit();
+ #else
+--- a/output.c	2026-09-09 02:42:37.000000000 +0100
++++ b/output.c	2026-10-10 10:07:09.743054539 +0100
+@@ -13,6 +13,9 @@
+  */
+ 
+ #include "less.h"
++#ifdef __VMS
++#include "vms_tty.h"
++#endif
+ #if MSDOS_COMPILER==WIN32C
+ #include "windows.h"
+ #ifndef COMMON_LVB_UNDERSCORE
+@@ -462,7 +465,12 @@
+ #endif
+ #endif
+ 
++#ifdef __VMS
++	/* To the terminal, unformatted by its driver (vms/vms_tty.c). */
++	if (vms_tty_write(outfd, obuf, n) != (long) n)
++#else
+ 	if (write(outfd, obuf, n) != (ssize_t) n)
++#endif
+ 		screen_trashed();
+ }
+ 
