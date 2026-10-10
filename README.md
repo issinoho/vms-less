@@ -18,7 +18,7 @@ Work in progress.
 | Build (`tools/build.sh`) | clean | clean |
 | DCL smoke test, 8 checks (`tools/test.sh`) | 8/8 | 8/8 |
 | Interactive test, 14 checks (`tools/ttytest.sh`) | 14/14 | 14/14 |
-| PCSI kit `ISSINOHO <base> LESS V710.0-0E1` (`tools/kit.sh`) | - | - |
+| PCSI kit `ISSINOHO <base> LESS V7.10-0E1` (`tools/kit.sh`) | built | built |
 | Install check (`tools/installcheck.sh`) | - | - |
 
 ## Workflow

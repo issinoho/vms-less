@@ -66,7 +66,7 @@ MMS does not track compiler flags: after changing `ccflags.txt` or `CFLAGS` in
 - **Layout:** less has no gnulib and no library: its sources are at the top of the tree,
   `defines.h` (configure's header) too, and LESS.EXE is linked from them and the VMS files
   (`gen_mms.py` with an empty library list). lessecho is not built. Versions are one number
-  (710): the PCSI version is V710.0-0E<level>.
+  (710): the PCSI version is V7.10-0E<level> (hundreds and the rest; PCSI rejects V710.0).
 - **Patches:** the family's generic patches target gnulib files, so none apply here; VMS
   changes to less go in `patches/` as for the other ports.
 - **Terminal:** no termcap or terminfo library on VMS. `vms/vms_termcap.c` supplies

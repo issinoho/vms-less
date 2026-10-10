@@ -106,10 +106,15 @@ GEN_MMS_SRC_BASE= GEN_MMS_CONFIG_DIR= GEN_MMS_CONFIG_H=defines.h python3 "$top/t
 if [ -d "$stage/vms/kit" ]; then
 step "PCSI kit inputs"
 : "${KIT_PRODUCER:=ISSINOHO}"
-# Versions: less's are one number (710), so the PCSI version is V<n>.0-0E<level>; our VMS
-# patch level is the ECO, so $UPSTREAM_VERSION-vms$VMS_PATCH_LEVEL is V<major>.<minor>-<update>E<level>.
+# Versions: our VMS patch level is the ECO, so $UPSTREAM_VERSION-vms$VMS_PATCH_LEVEL is
+# V<major>.<minor>-<update>E<level>.  less's versions are one number, which PCSI rejects as
+# a major version (%PCSI-E-S_INVVER for V710.0): 710 is V7.10, hundreds and the rest, which
+# keeps the order (711 V7.11, 800 V8.0).
 IFS=. read -r major minor update _ <<< "$UPSTREAM_VERSION"
-pcsiversion="V$major.${minor:-0}-${update:-0}E$VMS_PATCH_LEVEL"
+if [ -z "${minor:-}" ]; then
+    minor=$((major % 100)); major=$((major / 100))
+fi
+pcsiversion="V$major.$minor-${update:-0}E$VMS_PATCH_LEVEL"
 kitversion="$UPSTREAM_VERSION-vms$VMS_PATCH_LEVEL"
 kit=$stage/vms/kit
 subst() {
